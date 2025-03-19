@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # Install Java 17
 apt update
@@ -44,3 +44,12 @@ systemctl restart nginx
 # Start Jenkins
 systemctl enable jenkins
 systemctl restart jenkins
+
+# Install Certbot and get SSL certificate
+apt install -y certbot python3-certbot-nginx
+
+certbot --nginx --non-interactive --agree-tos --redirect \
+  -m a.shemtov@itoutposts.com -d jenkinsaws.1ms.my
+
+# Confirm completion
+echo "User data script completed at $(date)" >> /var/log/user_data.log
