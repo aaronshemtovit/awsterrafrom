@@ -1,5 +1,5 @@
 variable "vpc_cidr_block" {
-  description = "CIDR block for the main VPC"
+  description = "CIDR block for the VPC"
   type        = string
 }
 
@@ -34,26 +34,21 @@ variable "private_subnet_3_cidr" {
 }
 
 variable "availability_zones" {
-  description = "Availability zones for subnets"
+  description = "List of availability zones"
   type        = list(string)
 }
 
 variable "ec2_ami" {
-  description = "AMI ID for EC2 instance"
+  description = "AMI ID for the EC2 instance"
   type        = string
 }
 
 variable "ec2_instance_type" {
-  description = "Instance type for EC2"
+  description = "EC2 instance type"
   type        = string
 }
 
 variable "ec2_key_name" {
   description = "Key pair name for EC2 instance"
-  type        = string
-}
-
-variable "nat_eip_allocation_id" {
-  description = "Allocation ID of EIP for NAT Gateway"
   type        = string
 }

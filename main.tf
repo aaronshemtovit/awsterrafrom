@@ -95,8 +95,16 @@ resource "aws_internet_gateway" "igw" {
 }
 
 # NAT Gateway
+resource "aws_eip" "nat_eip" {
+  domain = "vpc"
+
+  tags = {
+    Name = "Aaron-NAT-EIP"
+  }
+}
+
 resource "aws_nat_gateway" "nat_gw" {
-  allocation_id = var.nat_eip_allocation_id
+  allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnet_1.id
 
   tags = {
@@ -118,6 +126,21 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
+resource "aws_route_table_association" "public_subnet_1_assoc" {
+  subnet_id      = aws_subnet.public_subnet_1.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "public_subnet_2_assoc" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "public_subnet_3_assoc" {
+  subnet_id      = aws_subnet.public_subnet_3.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -129,6 +152,21 @@ resource "aws_route_table" "private_rt" {
   tags = {
     Name = "Aaron-Private-RT"
   }
+}
+
+resource "aws_route_table_association" "private_subnet_1_assoc" {
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+resource "aws_route_table_association" "private_subnet_2_assoc" {
+  subnet_id      = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+resource "aws_route_table_association" "private_subnet_3_assoc" {
+  subnet_id      = aws_subnet.private_subnet_3.id
+  route_table_id = aws_route_table.private_rt.id
 }
 
 # Security Group
@@ -181,14 +219,6 @@ resource "aws_security_group" "my_sg" {
   }
 }
 
-# Elastic IP for EC2 instance
-resource "aws_eip" "ec2_eip" {
-  domain        = "vpc"
-  tags = {
-    Name = "Aaron-EC2-EIP"
-  }
-}
-
 # EC2 Instance
 resource "aws_instance" "my_ec2" {
   ami                         = var.ec2_ami
@@ -196,7 +226,7 @@ resource "aws_instance" "my_ec2" {
   subnet_id                   = aws_subnet.public_subnet_1.id
   key_name                    = var.ec2_key_name
   vpc_security_group_ids      = [aws_security_group.my_sg.id]
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   user_data                   = file("user_data.sh")
 
   tags = {
@@ -207,9 +237,4 @@ resource "aws_instance" "my_ec2" {
     volume_size = 8
     volume_type = "gp2"
   }
-}
-
-resource "aws_eip_association" "ec2_eip_assoc" {
-  instance_id   = aws_instance.my_ec2.id
-  allocation_id = aws_eip.ec2_eip.id
 }
